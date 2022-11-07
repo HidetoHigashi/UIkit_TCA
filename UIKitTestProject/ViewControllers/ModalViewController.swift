@@ -18,12 +18,22 @@ class ModalViewController: UIViewController {
         return label
     }()
     
+    private lazy var closeButton: UIButton = {
+        let button: UIButton = UIButton(type: .system)
+        let buttonImage: UIImage? = UIImage(systemName: "xmark.circle.fill")?.withTintColor(.gray, renderingMode: .alwaysOriginal)
+        button.setImage(buttonImage, for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(closeModal), for: .touchUpInside)
+        return button
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         self.view.backgroundColor = .white
 
         self.view.addSubview(modalLabel)
+        self.view.addSubview(closeButton)
         
         applyConstraints()
     }
@@ -33,8 +43,18 @@ class ModalViewController: UIViewController {
             modalLabel.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 10),
             modalLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
         ]
+        let closeButtonConstraints = [
+            closeButton.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            closeButton.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -10)
+        ]
+        
         
         NSLayoutConstraint.activate(modalLabelConstraints)
+        NSLayoutConstraint.activate(closeButtonConstraints)
+    }
+    
+    @objc private func closeModal() {
+        self.dismiss(animated: true)
     }
 }
 
