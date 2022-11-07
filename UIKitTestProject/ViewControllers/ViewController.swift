@@ -23,29 +23,37 @@ class ViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private var testButton: UIButton = {
+    private lazy var testButton: UIButton = {
         let button: UIButton = UIButton(type: .system)
         button.setTitle("テスト", for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(onTapButton), for: .touchUpInside)
         return button
     }()
     
-    private var testTextField: UITextField = {
+    private lazy var testTextField: UITextField = {
         let textField: UITextField = UITextField()
         textField.borderStyle = .roundedRect
         textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.addTarget(self, action: #selector(changeText(sender: )), for: .editingChanged)
         return textField
+    }()
+    
+    private lazy var showModalButton: UIButton = {
+        let button: UIButton = UIButton(type: .system)
+        button.setTitle("モーダルを表示", for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(showModalView), for: .touchUpInside)
+        return button
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        testButton.addTarget(self, action: #selector(onTapButton), for: .touchUpInside)
-        testTextField.addTarget(self, action: #selector(changeText(sender: )), for: .editingChanged)
-        
         self.view.addSubview(testButton)
         self.view.addSubview(testTextField)
-
+        self.view.addSubview(showModalButton)
+        
         applyConstraints()
         applyPublisher()
     }
@@ -63,8 +71,15 @@ class ViewController: UIViewController {
             testTextField.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
         ]
         
+        let showModalButtonConstraints = [
+            showModalButton.topAnchor.constraint(equalTo: testTextField.bottomAnchor, constant: 10),
+            showModalButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+        ]
+        
         NSLayoutConstraint.activate(testButtonConstraints)
         NSLayoutConstraint.activate(testTextFieldConstraints)
+        NSLayoutConstraint.activate(showModalButtonConstraints)
+        
     }
     
     private func applyPublisher() {
@@ -97,6 +112,13 @@ class ViewController: UIViewController {
     
     @objc func changeText(sender: UITextField) {
         self.viewStore.send(.textChange(sender.text ?? ""))
+    }
+    
+    //MARK: - Show modal
+    @objc func showModalView() {
+        let vc = ModalViewController()
+        vc.modalPresentationStyle = .formSheet
+        present(vc, animated: true)
     }
 }
 
