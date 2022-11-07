@@ -6,12 +6,14 @@
 //
 
 import SwiftUI
+import Combine
 import UIKit
 import ComposableArchitecture
 
 class ViewController: UIViewController {
     let viewStore: ViewStoreOf<Test>
-
+    private var cancellables: Set<AnyCancellable> = []
+    
     init(store: StoreOf<Test>) {
         self.viewStore = ViewStore(store)
         super.init(nibName: nil, bundle: nil)
@@ -45,6 +47,7 @@ class ViewController: UIViewController {
         self.view.addSubview(testTextField)
 
         applyConstraints()
+        applyPublisher()
     }
     
     
@@ -62,6 +65,30 @@ class ViewController: UIViewController {
         
         NSLayoutConstraint.activate(testButtonConstraints)
         NSLayoutConstraint.activate(testTextFieldConstraints)
+    }
+    
+    private func applyPublisher() {
+        self.viewStore.publisher.text
+            .assign(to: \.text, on: testTextField)
+            .store(in: &self.cancellables)
+        
+        self.viewStore.publisher.alert
+            .sink { [weak self] alert in
+                guard let self = self else { return }
+                guard let alert = alert else { return }
+                let title: String = String(state: alert.title)
+                let message: String = String(state: alert.message ?? TextState(""))
+                
+                let alertContoller = UIAlertController(title: title, message: message, preferredStyle: .alert)
+                alertContoller.addAction(UIAlertAction(title: "はい", style: .default) { _ in
+                    self.viewStore.send(.onDismissAlert("はい"))
+                })
+                alertContoller.addAction(UIAlertAction(title: "いいえ", style: .destructive) { _ in
+                    self.viewStore.send(.onDismissAlert("いいえ"))
+                })
+                self.present(alertContoller, animated: true, completion: nil)
+            }
+            .store(in: &self.cancellables)
     }
     
     @objc func onTapButton() {
