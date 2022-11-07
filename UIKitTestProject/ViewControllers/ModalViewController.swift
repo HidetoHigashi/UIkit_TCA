@@ -27,6 +27,14 @@ class ModalViewController: UIViewController {
         return button
     }()
     
+    private let testTable: UITableView = {
+        let table: UITableView = UITableView()
+        table.register(TestTableViewCell.self, forCellReuseIdentifier: TestTableViewCell.identifier)
+        table.translatesAutoresizingMaskIntoConstraints = false
+        return table
+    }()
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -34,6 +42,7 @@ class ModalViewController: UIViewController {
 
         self.view.addSubview(modalLabel)
         self.view.addSubview(closeButton)
+        self.view.addSubview(testTable)
         
         applyConstraints()
     }
@@ -47,10 +56,19 @@ class ModalViewController: UIViewController {
             closeButton.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 10),
             closeButton.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -10)
         ]
-        
-        
+        let testTableConstraints = [
+            testTable.topAnchor.constraint(equalTo: modalLabel.bottomAnchor, constant: 10),
+//            tableView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 10)
+            testTable.heightAnchor.constraint(equalToConstant: 500)
+        ]
+
         NSLayoutConstraint.activate(modalLabelConstraints)
         NSLayoutConstraint.activate(closeButtonConstraints)
+        NSLayoutConstraint.activate(testTableConstraints)
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
     }
     
     @objc private func closeModal() {
