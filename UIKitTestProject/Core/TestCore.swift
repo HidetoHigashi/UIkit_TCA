@@ -13,10 +13,12 @@ struct Test: ReducerProtocol {
     
     struct State: Equatable {
         var alert: AlertState<Action>?
+        var text: String?
     }
     
     enum Action: Equatable {
         case onTapButton
+        case textChange(String)
     }
     
     init() {}
@@ -26,6 +28,10 @@ struct Test: ReducerProtocol {
             switch action {
             case .onTapButton:
                 print("onTapButton!")
+                return .none
+            case .textChange(let text):
+                state.text = text
+                print(state.text)
                 return .none
             }
         }
