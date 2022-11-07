@@ -24,16 +24,25 @@ class ViewController: UIViewController {
     private var testButton: UIButton = {
         let button: UIButton = UIButton(type: .system)
         button.setTitle("テスト", for: .normal)
-//        button.setTitleColor(.blue, for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
+    }()
+    
+    private var testTextField: UITextField = {
+        let textField: UITextField = UITextField()
+        textField.borderStyle = .roundedRect
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         testButton.addTarget(self, action: #selector(onTapButton), for: .touchUpInside)
+        testTextField.addTarget(self, action: #selector(changeText(sender: )), for: .editingChanged)
+        
         self.view.addSubview(testButton)
+        self.view.addSubview(testTextField)
 
         applyConstraints()
     }
@@ -41,15 +50,26 @@ class ViewController: UIViewController {
     
     private func applyConstraints() {
         let testButtonConstraints = [
-            testButton.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+            testButton.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 10),
             testButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
         ]
         
+        let testTextFieldConstraints = [
+            testTextField.topAnchor.constraint(equalTo: testButton.bottomAnchor, constant: 10),
+            testTextField.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width),
+            testTextField.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+        ]
+        
         NSLayoutConstraint.activate(testButtonConstraints)
+        NSLayoutConstraint.activate(testTextFieldConstraints)
     }
     
     @objc func onTapButton() {
         self.viewStore.send(.onTapButton)
+    }
+    
+    @objc func changeText(sender: UITextField) {
+        self.viewStore.send(.textChange(sender.text ?? ""))
     }
 }
 
