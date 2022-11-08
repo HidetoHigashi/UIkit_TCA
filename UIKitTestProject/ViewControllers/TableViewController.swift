@@ -10,9 +10,12 @@ import UIKit
 
 class TableViewController: UIViewController {
 
-    private let testTable: UITableView = {
+    public lazy var testTable: UITableView = {
         let table: UITableView = UITableView()
         table.register(TestTableViewCell.self, forCellReuseIdentifier: TestTableViewCell.identifier)
+        table.refreshControl = UIRefreshControl()
+        table.refreshControl?.addTarget(self, action: #selector(reloadTable), for: .valueChanged)
+        table.translatesAutoresizingMaskIntoConstraints = false
         return table
     }()
     
@@ -22,10 +25,18 @@ class TableViewController: UIViewController {
         
         testTable.delegate = self
         testTable.dataSource = self
+        
     }
     
     override func viewWillLayoutSubviews() {
         testTable.frame = self.view.bounds
+    }
+    
+    @objc public func reloadTable() {
+        Task {
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+            testTable.refreshControl?.endRefreshing()
+        }
     }
 }
 
