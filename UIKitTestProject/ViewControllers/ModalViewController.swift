@@ -10,6 +10,7 @@ import UIKit
 
 class ModalViewController: UIViewController {
     
+    private let tableViewController = TableViewController()
     private var modalLabel: UILabel = {
         let label: UILabel = UILabel()
         label.text = "モーダル"
@@ -27,10 +28,8 @@ class ModalViewController: UIViewController {
         return button
     }()
     
-    private let testTable: UITableView = {
-        let table: UITableView = UITableView()
-        table.register(TestTableViewCell.self, forCellReuseIdentifier: TestTableViewCell.identifier)
-        table.translatesAutoresizingMaskIntoConstraints = false
+    private lazy var testTable: UITableView = {
+        let table: UITableView = tableViewController.testTable
         return table
     }()
     
@@ -42,6 +41,10 @@ class ModalViewController: UIViewController {
 
         self.view.addSubview(modalLabel)
         self.view.addSubview(closeButton)
+        
+        testTable.delegate = tableViewController.self
+        testTable.dataSource = tableViewController.self
+        
         self.view.addSubview(testTable)
         
         applyConstraints()
@@ -58,8 +61,6 @@ class ModalViewController: UIViewController {
         ]
         let testTableConstraints = [
             testTable.topAnchor.constraint(equalTo: modalLabel.bottomAnchor, constant: 10),
-//            tableView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 10)
-            testTable.heightAnchor.constraint(equalToConstant: 500)
         ]
 
         NSLayoutConstraint.activate(modalLabelConstraints)
@@ -69,6 +70,10 @@ class ModalViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        testTable.frame = CGRect(x: 0,
+                                 y: modalLabel.frame.height + 20,
+                                 width: UIScreen.main.bounds.width,
+                                 height: UIScreen.main.bounds.height)
     }
     
     @objc private func closeModal() {
